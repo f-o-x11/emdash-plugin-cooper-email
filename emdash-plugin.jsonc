@@ -1,0 +1,48 @@
+{
+	"$schema": "./node_modules/@emdash-cms/plugin-cli/schemas/emdash-plugin.schema.json",
+
+	"slug": "cooper-email",
+	// Set this to the publishing account's DID before the first publish.
+	// `emdash-plugin login <handle>` prints it ("DID: did:plc:...").
+	// Publishing refuses to run while this does not match the signed-in account.
+	"publisher": "did:plc:aaaaaaaaaaaaaaaaaaaaaaaa",
+
+	"name": "Cooper Email",
+	"license": "MIT",
+	"author": { "name": "Avatar 8 LLC", "url": "https://cooperemail.com" },
+	"security": { "email": "ops@avatar33.com" },
+	"description": "Send your site's email (sign-in links, notifications, plugin mail) through a Cooper Email inbox.",
+	"keywords": ["email", "smtp", "transactional email", "email transport", "cooper email"],
+	"repo": "https://github.com/f-o-x11/emdash-plugin-cooper-email",
+
+	// Trust contract.
+	// - hooks.email-transport:register: lets the plugin register the exclusive
+	//   `email:deliver` hook and act as the site's email transport.
+	// - network:request + allowedHosts: outbound HTTPS to the Cooper API only.
+	"capabilities": ["hooks.email-transport:register", "network:request"],
+	"allowedHosts": ["cooperemail.com"],
+	"storage": {},
+
+	"admin": {
+		"pages": [{ "path": "/settings", "label": "Cooper Email", "icon": "send" }],
+		"settingsSchema": {
+			"apiKey": {
+				"type": "secret",
+				"label": "Cooper API key",
+				"description": "A coop_live_ key from cooperemail.com. Stored encrypted."
+			},
+			"inboxId": {
+				"type": "string",
+				"label": "Inbox ID",
+				"description": "The Cooper inbox to send from (inb_...)."
+			}
+		}
+	},
+
+	"sections": {
+		"description": "Cooper Email gives software its own email inbox through a simple HTTP API. This plugin makes a Cooper inbox the email transport for your EmDash site, so sign-in links, user invites, and mail sent by other plugins go out from an address like `yoursite@cooperemail.com`.\n\nIt registers EmDash's exclusive `email:deliver` hook and sends each message with Cooper's `POST /api/v1/inboxes/{id}/messages` endpoint, passing through the subject, plain text, HTML, CC, and Reply-To. Replies land in the same Cooper inbox, where you can read them from the Cooper dashboard, the API, or its MCP server.",
+		"installation": "1. Create a free Cooper Email account and inbox: `curl -s https://cooperemail.com/api/v1/onboard -H 'content-type: application/json' -d '{\"username\":\"my-site\"}'`. Save the `api_key` and `inbox.id` from the response.\n2. Install this plugin from the Registry in your EmDash admin and approve its permissions (email transport, network access to cooperemail.com).\n3. Open **Cooper Email** in the plugin admin, paste the API key and inbox ID, and select **Save**. The page shows the address mail will be sent from.\n4. Use **Send test email** to confirm delivery.",
+		"faq": "**Does it cost anything?** Cooper Email's Free plan includes 5 inboxes and 5,000 emails a month with no card.\n\n**Which address does mail come from?** The Cooper inbox you configure, for example `my-site@cooperemail.com`. Custom domains are available on paid Cooper plans.\n\n**What happens if it is not configured?** Delivery fails with a clear error instead of dropping mail silently.",
+		"security": "The API key is declared as a secret setting, so EmDash encrypts it at rest and never returns it to the browser. The plugin can only make network requests to cooperemail.com. Report security issues to ops@avatar33.com."
+	}
+}
