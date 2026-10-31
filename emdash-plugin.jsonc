@@ -5,7 +5,7 @@
 	// Set this to the publishing account's DID before the first publish.
 	// `emdash-plugin login <handle>` prints it ("DID: did:plc:...").
 	// Publishing refuses to run while this does not match the signed-in account.
-	"publisher": "did:plc:aaaaaaaaaaaaaaaaaaaaaaaa",
+	"publisher": "did:plc:w2dq7d36vo4ubpjwqhbpfghi",
 
 	"name": "Cooper Email",
 	"license": "MIT",
